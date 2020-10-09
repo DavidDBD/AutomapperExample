@@ -1,0 +1,12 @@
+C:\Users\dbarr\source\repos\TestAutoMapCollection\bin\Debug\netcoreapp2.1\TestAutoMapCollection.deps.json
+C:\Users\dbarr\source\repos\TestAutoMapCollection\bin\Debug\netcoreapp2.1\TestAutoMapCollection.runtimeconfig.json
+C:\Users\dbarr\source\repos\TestAutoMapCollection\bin\Debug\netcoreapp2.1\TestAutoMapCollection.runtimeconfig.dev.json
+C:\Users\dbarr\source\repos\TestAutoMapCollection\bin\Debug\netcoreapp2.1\TestAutoMapCollection.dll
+C:\Users\dbarr\source\repos\TestAutoMapCollection\obj\Debug\netcoreapp2.1\TestAutoMapCollection.csprojAssemblyReference.cache
+C:\Users\dbarr\source\repos\TestAutoMapCollection\obj\Debug\netcoreapp2.1\TestAutoMapCollection.AssemblyInfoInputs.cache
+C:\Users\dbarr\source\repos\TestAutoMapCollection\obj\Debug\netcoreapp2.1\TestAutoMapCollection.AssemblyInfo.cs
+C:\Users\dbarr\source\repos\TestAutoMapCollection\obj\Debug\netcoreapp2.1\TestAutoMapCollection.genruntimeconfig.cache
+C:\Users\dbarr\source\repos\TestAutoMapCollection\bin\Debug\netcoreapp2.1\TestAutoMapCollection.pdb
+C:\Users\dbarr\source\repos\TestAutoMapCollection\obj\Debug\netcoreapp2.1\TestAutoMapCollection.dll
+C:\Users\dbarr\source\repos\TestAutoMapCollection\obj\Debug\netcoreapp2.1\TestAutoMapCollection.pdb
+C:\Users\dbarr\source\repos\TestAutoMapCollection\obj\Debug\netcoreapp2.1\TestAutoMapCollection.csproj.CoreCompileInputs.cache
