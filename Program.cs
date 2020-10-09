@@ -3,7 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Security.Cryptography.X509Certificates;
+using AutoMapper.EquivalencyExpression;
+using Microsoft.EntityFrameworkCore.Query.ExpressionVisitors.Internal;
 using TestAutoMapCollection.DTOs;
 using TestAutoMapCollection.Models;
 
@@ -12,7 +17,6 @@ namespace TestAutoMapCollection
     class Program
     {
         private static IMapper _mapper;
-
         private static void CreateOrder()
         {
             using (var context = new ContextFactory().CreateDbContext(null))
@@ -52,7 +56,6 @@ namespace TestAutoMapCollection
             {
                 var data = context.Orders
                     .Include(x => x.OrderLines)
-                    //.ThenInclude(x => x.Products)
                     .FirstOrDefault();
 
                 orderDto = _mapper.Map<OrderDTO>(data);
@@ -78,7 +81,10 @@ namespace TestAutoMapCollection
                 catch (Exception ex)
                 {
                     var baseMessage = ex.GetBaseException().Message;
+
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine(baseMessage);
+                    Console.ResetColor();
                 }
             }
         }
@@ -95,6 +101,7 @@ namespace TestAutoMapCollection
 
             var config = new MapperConfiguration(cfg =>
             {
+                cfg.AddCollectionMappers();
                 cfg.AddProfile<Profiles>();
             });
 
@@ -117,51 +124,49 @@ namespace TestAutoMapCollection
         }
     }
 
+    public static class AutoMapperCollectionExtensions{
+        public static void MapCollection<TSource, TDest, IDType>(this ResolutionContext context, List<TSource> dtos, List<TDest> databaseEntities, Func<TSource, IDType> sourceId, Func<TDest, IDType> destinationId)
+        {
+            foreach (var item in dtos)
+            {
+                if (sourceId(item).Equals(default(IDType)))
+                {
+                    databaseEntities.Add(context.Mapper.Map<TSource, TDest>(item));
+                }
+                else
+                {
+                    var exist = databaseEntities.SingleOrDefault(x => destinationId(x).Equals(sourceId(item)));
+
+                    if (exist != null)
+                    {
+                        context.Mapper.Map(item, exist);
+                    }
+                }
+            }
+        }
+    }
+
     public class Profiles : Profile
     {
         public Profiles()
         {
-            CreateMap<Order, OrderDTO>().ReverseMap();
+            
+        CreateMap<Order, OrderDTO>();
 
-            CreateMap<OrderLine, OrderLineDTO>().ReverseMap();
+            CreateMap<OrderDTO, Order>()
+                .ForMember(dest => dest.OrderLines, map => map.Ignore())
+                .MaxDepth(5)
+                .AfterMap((dto, order, ctx) =>
+                {
+                    ctx.MapCollection(dto.OrderLines, order.OrderLines, lineDto => lineDto.OrderLineId, line => line.OrderLineId);
+                });
+
+            CreateMap<OrderLine, OrderLineDTO>()
+                .MaxDepth(5);
+
+            CreateMap<OrderLineDTO, OrderLine>()
+                .ForMember(dest=> dest.Order, map => map.Ignore())
+                .MaxDepth(5);
         }
     }
-
-    #region Profiles with the AfterMap Used
-    //internal class Profiles : Profile
-    //{
-    //    public Profiles()
-    //    {
-    //        CreateMap<OrderDTO, Order>()
-    //            .ForMember(d => d.OrderLines, opt => opt.Ignore())
-    //            .AfterMap(AddOrUpdate)
-    //            .ReverseMap();
-
-    //        CreateMap<OrderLine, OrderLineDTO>()
-    //            .ReverseMap();
-    //    }
-    //    private void AddOrUpdate(OrderDTO orderDto, Order order)
-    //    {
-    //        foreach (var dto in orderDto.OrderLines)
-    //        {
-    //            if (dto.OrderLineId == 0)
-    //            {
-    //                //order.OrderLines.Add(Mapper.Map<Order>(dto));
-    //                order.OrderLines.Add(new OrderLine(){
-    //                    Description = dto.Description,
-    //                    OrderId = dto.Order.OrderId
-    //                });
-    //            }
-    //            else
-    //            {
-    //                var ol = order.OrderLines.SingleOrDefault(x => x.OrderLineId == dto.OrderLineId);
-
-    //                ol.Description = dto.Description;
-
-    //                //Mapper.Map(dto, order.OrderLines.SingleOrDefault(c => c.OrderLineId == dto.OrderLineId));
-    //            }
-    //        }
-    //    }
-    //}
-    #endregion region
 }

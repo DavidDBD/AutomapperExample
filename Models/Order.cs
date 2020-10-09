@@ -7,7 +7,7 @@ namespace TestAutoMapCollection.Models
     {
         public int OrderId { get; set; }
         
-        public List<OrderLine> OrderLines { get; set; }
+        public virtual List<OrderLine> OrderLines { get; set; }
 
         public string Description { get; set; }
     }
